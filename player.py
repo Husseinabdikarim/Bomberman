@@ -5,11 +5,23 @@ from config import WIDTH, HEIGHT, TILE_SIZE, PLAYER_SIZE
 
 class Player:
     def __init__(self, game):
+        """
+        Initialize the Player object.
+
+        :param game: Reference to the Game object.
+        """
         self.game = game
         self.x, self.y = 0, 0
         self.target_x, self.target_y = 0, 0  # Target position on the grid
 
     def update(self, input_state, walls, bombs):
+        """
+        Update the player's position and actions.
+
+        :param input_state: Dictionary of input states (e.g., movement and bomb drop).
+        :param walls: List of wall objects to check for collisions.
+        :param bombs: List of active bombs.
+        """
         # If the player is not at their target position, don't accept new input
         if self.x != self.target_x or self.y != self.target_y:
             self.move_towards_target()
@@ -36,6 +48,14 @@ class Player:
         self.drop_bomb(bombs, input_state)
 
     def player_movement(self, input_state, new_target_x, new_target_y):
+        """
+        Calculate the player's new target position based on input.
+
+        :param input_state: Dictionary of input states.
+        :param new_target_x: Current target x-coordinate.
+        :param new_target_y: Current target y-coordinate.
+        :return: Updated target x and y coordinates.
+        """
         # Only allow horizontal or vertical movement, but not both at the same time
         if input_state["left"] and self.target_x > 0:
             new_target_x -= TILE_SIZE
@@ -48,7 +68,12 @@ class Player:
         return new_target_x, new_target_y
 
     def drop_bomb(self, bombs, input_state):
-        # Drop Bomb
+        """
+        Drop a bomb at the player's current position.
+
+        :param bombs: List of active bombs.
+        :param input_state: Dictionary of input states.
+        """
         if input_state["bomb"]:
             bomb_x = round(self.target_x / TILE_SIZE) * TILE_SIZE
             bomb_y = round(self.target_y / TILE_SIZE) * TILE_SIZE
@@ -59,7 +84,9 @@ class Player:
                 self.game.bomb_counter += 1
 
     def move_towards_target(self):
-        # Smoothly move towards the target position
+        """
+        Smoothly move the player towards their target position.
+        """
         if self.x < self.target_x:
             self.x += 5
         if self.x > self.target_x:
@@ -70,6 +97,12 @@ class Player:
             self.y -= 5
 
     def draw(self, screen):
+        """
+        Draw the player on the screen.
+
+        :param screen: The Pygame screen object.
+        """
         pygame.draw.rect(
             screen, (1, 58, 99), (self.x, self.y, PLAYER_SIZE, PLAYER_SIZE)
         )
+

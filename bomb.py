@@ -24,7 +24,23 @@ class Bomb:
         # Trigger explosion
         explosion = Explosion(self.x, self.y)
         self.game.explosions.append(explosion)
-        self.game.bombs.remove(self)
+
+        # Remove the current bomb from the list
+        if self in self.game.bombs:
+            self.game.bombs.remove(self)
+
+        # Check for neighboring bombs
+        neighbors = [
+            (self.x + TILE_SIZE, self.y),  # Right
+            (self.x - TILE_SIZE, self.y),  # Left
+            (self.x, self.y + TILE_SIZE),  # Down
+            (self.x, self.y - TILE_SIZE),  # Up
+        ]
+
+        for nx, ny in neighbors:
+            for bomb in self.game.bombs[:]:  # Check remaining bombs
+                if bomb.x == nx and bomb.y == ny:
+                    bomb.explode()  # Chain explosion
 
     def draw(self, screen):
         bomb_rect = Bomb.bomb_surf.get_rect(

@@ -105,4 +105,3 @@ class Player:
         pygame.draw.rect(
             screen, (1, 58, 99), (self.x, self.y, PLAYER_SIZE, PLAYER_SIZE)
         )
-

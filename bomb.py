@@ -82,4 +82,3 @@ class Bomb:
                 center=(self.x + TILE_SIZE // 2, self.y + TILE_SIZE // 2)
             )
             screen.blit(Bomb.bomb_surf, bomb_rect)
-

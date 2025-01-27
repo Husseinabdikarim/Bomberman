@@ -24,4 +24,3 @@ class Wall(Tile):
         pygame.draw.rect(
             screen, (50, 50, 50), (self.x, self.y, self.size, self.size), 1
         )  # Border
-

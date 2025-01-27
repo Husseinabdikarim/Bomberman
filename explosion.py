@@ -25,4 +25,3 @@ class Explosion:
         :param screen: The Pygame screen object.
         """
         pygame.draw.circle(screen, (255, 0, 0), (self.x, self.y), 30)
-

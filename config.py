@@ -1,0 +1,6 @@
+# Game Constants
+WIDTH = 600
+HEIGHT = 600
+TILE_SIZE = 40
+FPS = 60
+PLAYER_SIZE = 30

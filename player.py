@@ -4,6 +4,8 @@ from config import WIDTH, HEIGHT, TILE_SIZE, PLAYER_SIZE
 
 
 class Player:
+    player_surf = None
+    
     def __init__(self, game):
         """
         Initialize the Player object.
@@ -13,6 +15,11 @@ class Player:
         self.game = game
         self.x, self.y = 0, 0
         self.target_x, self.target_y = 0, 0  # Target position on the grid
+        if Player.player_surf is None:
+          Player.player_surf = pygame.transform.scale(
+                pygame.image.load("bomberman.png").convert_alpha(),
+                (TILE_SIZE, TILE_SIZE),
+            )
 
     def update(self, input_state, walls, bombs):
         """
@@ -101,7 +108,8 @@ class Player:
         Draw the player on the screen.
 
         :param screen: The Pygame screen object.
-        """
-        pygame.draw.rect(
-            screen, (1, 58, 99), (self.x, self.y, PLAYER_SIZE, PLAYER_SIZE)
-        )
+        """ 
+        player_rect = Player.player_surf.get_rect(
+                center=(self.x + TILE_SIZE // 2, self.y + TILE_SIZE // 2)
+            )
+        screen.blit(Player.player_surf, player_rect)

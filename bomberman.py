@@ -5,8 +5,9 @@ from bomb import Bomb
 from explosion import Explosion
 from wall import Wall
 from tile import Tile
-from config import WIDTH, HEIGHT, TILE_SIZE, FPS
+from config import WIDTH, HEIGHT, TILE_SIZE, FPS, EXCLUDED_ROWS, EXCLUDED_COLS
 from collections import deque
+
 
 class Game:
     def __init__(self):
@@ -25,11 +26,13 @@ class Game:
         self.player = Player(self)
         self.bombs = []
         self.bomb_queue = deque()  # Queue for handling bomb explosions
-        self.bomb_counter = 0      # Tracks the number of bombs on the map
+        self.bomb_counter = 0  # Tracks the number of bombs on the map
         self.explosions = []
         self.tiles = Game.create_map()
 
         # Add initial bombs to the map
+        # TODO 1: make sure to remove bombs inside the walls.
+        # TODO 2: make sure to add turns in them before explosion.
         self.add_initial_bombs(5)
 
     @staticmethod
@@ -43,10 +46,13 @@ class Game:
         for row in range(15):
             row_tiles = []
             for col in range(15):
-                if random.random() < 0.2:  # 20% chance to be a wall
-                    row_tiles.append(Wall(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE))
+                if row in EXCLUDED_ROWS and col in EXCLUDED_COLS:
+                    row_tiles.append(Tile(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, 0))
                 else:
-                    row_tiles.append(Tile(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, 0))  # 0 = Empty tile
+                    if random.random() < 0.2:  # 20% chance to be a wall
+                        row_tiles.append(Wall(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE))
+                    else:
+                        row_tiles.append(Tile(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, 0))  # 0 = Empty tile
             tiles.append(row_tiles)
         return tiles
 
@@ -126,6 +132,9 @@ class Game:
         for bomb in self.bombs:
             bomb.draw(self.screen)
 
+        # for explode in self.explosions:
+        #     explode.draw(self.screen)    
+
         pygame.display.flip()  # Update the display
 
     def get_walls(self):
@@ -159,6 +168,7 @@ class Game:
             # Create a Bomb object with the "initial" type
             new_bomb = Bomb(bomb_x, bomb_y, self, bomb_type="initial")
             self.bombs.append(new_bomb)
+
 
 if __name__ == "__main__":
     game = Game()

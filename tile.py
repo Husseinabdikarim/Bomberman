@@ -23,7 +23,7 @@ class Tile:
         :param screen: The Pygame screen object.
         """
         # Define colors
-        COLORS = {
+        colors = {
             0: (193, 245, 241),  # Empty tile color
             1: (193, 245, 241),  # Wall tile color
             2: (150, 75, 0),     # Breakable tile color
@@ -31,7 +31,7 @@ class Tile:
 
         # Draw tile
         pygame.draw.rect(
-            screen, COLORS[self.tile_type], (self.x, self.y, self.size, self.size)
+            screen, colors[self.tile_type], (self.x, self.y, self.size, self.size)
         )
 
         # Draw grid line (border)

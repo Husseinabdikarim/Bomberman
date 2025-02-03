@@ -22,7 +22,7 @@ class Game:
         self.clock = pygame.time.Clock()
         pygame.display.set_caption("Bomberman")
         self.running = True
-        self.player = Player(self)
+        self.players = [Player(self, 1), Player(self, 2)]  # Two players
         self.bombs = []
         self.bomb_queue = deque()  # Queue for handling bomb explosions
         self.bomb_counter = 0  # Tracks the number of bombs on the map
@@ -56,19 +56,22 @@ class Game:
 
     @staticmethod
     def get_input_state():
-        """
-        Retrieve the current state of player input.
-
-        :return: A dictionary with input states for movement and bomb placement.
-        """
-        # TODO 3: Consider 2 player modes.
+        """Handle inputs for both players"""
         keys = pygame.key.get_pressed()
         return {
-            "left": keys[pygame.K_LEFT],
-            "right": keys[pygame.K_RIGHT],
-            "up": keys[pygame.K_UP],
-            "down": keys[pygame.K_DOWN],
-            "bomb": keys[pygame.K_SPACE],
+            # Player 1 (Arrow keys + Space)
+            "p1_left": keys[pygame.K_LEFT],
+            "p1_right": keys[pygame.K_RIGHT],
+            "p1_up": keys[pygame.K_UP],
+            "p1_down": keys[pygame.K_DOWN],
+            "p1_bomb": keys[pygame.K_SPACE],
+
+            # Player 2 (WASD + LShift)
+            "p2_left": keys[pygame.K_a],
+            "p2_right": keys[pygame.K_d],
+            "p2_up": keys[pygame.K_w],
+            "p2_down": keys[pygame.K_s],
+            "p2_bomb": keys[pygame.K_LSHIFT]
         }
 
     def run(self):
@@ -100,8 +103,9 @@ class Game:
         walls = self.get_walls()
 
         # Update the player based on input
-        input_state = Game.get_input_state()
-        self.player.update(input_state, walls, self.bombs)
+        input_state = self.get_input_state()
+        for player in self.players:
+            player.update(input_state, walls, self.bombs)
 
         # Handle bomb explosions (process the bomb queue)
         if len(self.bomb_queue) >= 3:
@@ -127,7 +131,8 @@ class Game:
                 tile.draw(self.screen)
 
         # Draw the player, bombs, and explosions
-        self.player.draw(self.screen)
+        for player in self.players:
+            player.draw(self.screen)
         for bomb in self.bombs:
             bomb.draw(self.screen)
 
@@ -150,11 +155,17 @@ class Game:
 
         :param num_bombs: Number of bombs to add.
         """
+        protected_tiles = {
+            (0, 0),  # Player 1 start
+            (WIDTH//TILE_SIZE-1, HEIGHT//TILE_SIZE-1)  # Player 2 start
+        }
         for _ in range(num_bombs):
             # Find all empty tiles
             empty_tiles = []
             for row in range(15):
                 for col in range(15):
+                    if (col, row) in protected_tiles:
+                        continue
                     # Add the tile to empty_tiles if it is a Tile and not a Wall
                     if (isinstance(self.tiles[row][col], Tile)
                             and not isinstance(self.tiles[row][col], Wall)):

@@ -4,7 +4,7 @@ from player import Player
 from bomb import Bomb
 from wall import Wall
 from tile import Tile
-from config import WIDTH, HEIGHT, TILE_SIZE, FPS, EXCLUDED_ROWS, EXCLUDED_COLS
+from config import WIDTH, HEIGHT, TILE_SIZE, FPS, EXCLUDED_ROWS, EXCLUDED_COLS, PROTECTED_TILES
 from collections import deque
 
 
@@ -155,16 +155,12 @@ class Game:
 
         :param num_bombs: Number of bombs to add.
         """
-        protected_tiles = {
-            (0, 0),  # Player 1 start
-            (WIDTH//TILE_SIZE-1, HEIGHT//TILE_SIZE-1)  # Player 2 start
-        }
         for _ in range(num_bombs):
             # Find all empty tiles
             empty_tiles = []
             for row in range(15):
                 for col in range(15):
-                    if (col, row) in protected_tiles:
+                    if (col, row) in PROTECTED_TILES:
                         continue
                     # Add the tile to empty_tiles if it is a Tile and not a Wall
                     if (isinstance(self.tiles[row][col], Tile)

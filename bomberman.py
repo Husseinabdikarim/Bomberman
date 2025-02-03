@@ -2,7 +2,6 @@ import pygame
 import random
 from player import Player
 from bomb import Bomb
-from explosion import Explosion
 from wall import Wall
 from tile import Tile
 from config import WIDTH, HEIGHT, TILE_SIZE, FPS, EXCLUDED_ROWS, EXCLUDED_COLS
@@ -28,6 +27,7 @@ class Game:
         self.bomb_queue = deque()  # Queue for handling bomb explosions
         self.bomb_counter = 0  # Tracks the number of bombs on the map
         self.explosions = []
+        # self.bomb_turn = {}
         self.tiles = Game.create_map()
 
         # Add initial bombs to the map
@@ -105,14 +105,14 @@ class Game:
         self.player.update(input_state, walls, self.bombs)
 
         # Handle bomb explosions (process the bomb queue)
-        if len(self.bomb_queue) > 0 and self.bomb_counter >= 3:
+        if len(self.bomb_queue) >= 3:
             first_bomb = self.bomb_queue.popleft()
             first_bomb.explode()
-            self.bomb_counter -= 1
+            # self.bomb_counter -= 1
 
         # Update all bombs and explosions
-        for bomb in self.bombs[:]:
-            bomb.update()
+        # for bomb in self.bombs[:]:
+            # bomb.update()
         for explosion in self.explosions:
             explosion.update()
 
@@ -133,7 +133,7 @@ class Game:
             bomb.draw(self.screen)
 
         # for explode in self.explosions:
-        #     explode.draw(self.screen)    
+        #     explode.draw(self.screen)
 
         pygame.display.flip()
 
@@ -170,7 +170,8 @@ class Game:
             bomb_y = row * TILE_SIZE
 
             # Create a Bomb
-            new_bomb = Bomb(bomb_x, bomb_y, self, bomb_type="initial")
+            turns = random.randint(1, 3)
+            new_bomb = Bomb(bomb_x, bomb_y, self, turns, bomb_type="initial")
             self.bombs.append(new_bomb)
 
 

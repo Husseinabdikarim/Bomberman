@@ -16,7 +16,7 @@ class Player:
         self.x, self.y = 0, 0
         self.target_x, self.target_y = 0, 0  # Target position on the grid
         if Player.player_surf is None:
-          Player.player_surf = pygame.transform.scale(
+            Player.player_surf = pygame.transform.scale(
                 pygame.image.load("bomberman.png").convert_alpha(),
                 (TILE_SIZE, TILE_SIZE),
             )

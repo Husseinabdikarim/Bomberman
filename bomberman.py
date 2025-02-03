@@ -31,7 +31,6 @@ class Game:
         self.tiles = Game.create_map()
 
         # Add initial bombs to the map
-        # TODO 2: make sure to add turns in them before explosion.
         self.add_initial_bombs(5)
 
     @staticmethod

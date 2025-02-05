@@ -14,6 +14,15 @@ class Wall(Tile):
         super().__init__(x, y, size, 1)  # 1 = Wall tile
         self.color = (19, 17, 26)
 
+    @staticmethod
+    def get_walls(tiles):
+        """
+        Retrieve all wall tiles from the map.
+
+        :return: A list of Wall objects.
+        """
+        return [tile for row in tiles for tile in row if isinstance(tile, Wall)]
+
     def draw(self, screen):
         """
         Draw the wall on the screen.

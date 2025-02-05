@@ -21,12 +21,12 @@ class Player:
         # Load bomb images if not already loaded
         if Player.player_1_surf is None:
             Player.player_1_surf = pygame.transform.scale(
-                pygame.image.load("bomberman_p1.png").convert_alpha(),
+                pygame.image.load("assets/bomberman_p1.png").convert_alpha(),
                 (TILE_SIZE, TILE_SIZE),
             )
         if Player.player_2_surf is None:
             Player.player_2_surf = pygame.transform.scale(
-                pygame.image.load("bomberman_p2.png").convert_alpha(),
+                pygame.image.load("assets/bomberman_p2.png").convert_alpha(),
                 (TILE_SIZE, TILE_SIZE),
             )
 

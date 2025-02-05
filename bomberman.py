@@ -4,7 +4,7 @@ from player import Player
 from bomb import Bomb
 from wall import Wall
 from tile import Tile
-from config import WIDTH, HEIGHT, TILE_SIZE, FPS, EXCLUDED_ROWS, EXCLUDED_COLS, PROTECTED_TILES
+from config import WIDTH, HEIGHT, TILE_SIZE, FPS, EXCLUDED_ROWS, EXCLUDED_COLS
 from collections import deque
 
 
@@ -12,7 +12,7 @@ class Game:
     def __init__(self):
         """
         Initialize the Game object.
-        
+
         - Set up the screen, clock, and game state.
         - Initialize player, bombs, bomb queue, and explosions.
         - Generate the game map and add initial bombs.
@@ -27,17 +27,16 @@ class Game:
         self.bomb_queue = deque()  # Queue for handling bomb explosions
         self.bomb_counter = 0  # Tracks the number of bombs on the map
         self.explosions = []
-        # self.bomb_turn = {}
         self.tiles = Game.create_map()
 
         # Add initial bombs to the map
-        self.add_initial_bombs(5)
+        self.setup_initial_bombs()
 
     @staticmethod
     def create_map():
         """
         Generate the game map with a mix of walls and empty tiles.
-        
+
         :return: A 2D list representing the map tiles.
         """
         tiles = []
@@ -100,7 +99,8 @@ class Game:
         Update the game state, including player, bombs, and explosions.
         """
         # Get all wall tiles for collision detection
-        walls = self.get_walls()
+        walls = Wall.get_walls(self.tiles)
+        # walls = self.get_walls()
 
         # Update the player based on input
         input_state = self.get_input_state()
@@ -111,11 +111,7 @@ class Game:
         if len(self.bomb_queue) >= 3:
             first_bomb = self.bomb_queue.popleft()
             first_bomb.explode()
-            # self.bomb_counter -= 1
 
-        # Update all bombs and explosions
-        # for bomb in self.bombs[:]:
-            # bomb.update()
         for explosion in self.explosions:
             explosion.update()
 
@@ -136,49 +132,50 @@ class Game:
         for bomb in self.bombs:
             bomb.draw(self.screen)
 
-        # for explode in self.explosions:
-        #     explode.draw(self.screen)
-
         pygame.display.flip()
 
-    def get_walls(self):
-        """
-        Retrieve all wall tiles from the map.
+    def setup_initial_bombs(self):
+        """Ask the player if they want to manually place bombs."""
+        prompt = self.user_prompt()
+        if prompt:  # if prompt is 'y'
+            placed_bombs = Bomb.show_bomb_placement_screen(self)  # manually place bombs
+            bomb_turns = Bomb.get_bomb_turns(self, placed_bombs)  # Get turns for each bomb
 
-        :return: A list of Wall objects.
-        """
-        return [tile for row in self.tiles for tile in row if isinstance(tile, Wall)]
+            for (row, col), turn in bomb_turns.items():
+                bomb_x, bomb_y = col * TILE_SIZE, row * TILE_SIZE
+                self.bombs.append(Bomb(bomb_x, bomb_y, self, turn=turn, bomb_type="initial"))
+        else:  # if prompt is 'n'
+            Bomb.add_initial_bombs(self, 5)  # Automatic setup
 
-    def add_initial_bombs(self, num_bombs):
-        """
-        Add a specified number of random bombs to empty locations on the map.
+    def user_prompt(self):
+        """Show a simple Yes/No menu for bomb placement."""
+        font = pygame.font.Font(None, 36)
+        selecting = True
+        choice = False
 
-        :param num_bombs: Number of bombs to add.
-        """
-        for _ in range(num_bombs):
-            # Find all empty tiles
-            empty_tiles = []
-            for row in range(15):
-                for col in range(15):
-                    if (col, row) in PROTECTED_TILES:
-                        continue
-                    # Add the tile to empty_tiles if it is a Tile and not a Wall
-                    if (isinstance(self.tiles[row][col], Tile)
-                            and not isinstance(self.tiles[row][col], Wall)):
-                        empty_tiles.append((row, col))
+        while selecting:
+            self.screen.fill((30, 30, 30))
+            bg_image = pygame.image.load("assets/background_image.png")
+            bg_image = pygame.transform.scale(bg_image, (600, 600))
+            self.screen.blit(bg_image, (0, 0))
+            text = font.render("Do you want to manually place bombs? (Y/N)",
+                               True, (255, 200, 100))  # (255, 200, 100)
+            self.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - 50))
 
-            if not empty_tiles:
-                break  # No empty tiles found
+            pygame.display.flip()
 
-            # Randomly select a position for the bomb
-            row, col = random.choice(empty_tiles)
-            bomb_x = col * TILE_SIZE
-            bomb_y = row * TILE_SIZE
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_y:
+                        choice = True
+                        selecting = False
+                    elif event.key == pygame.K_n:
+                        selecting = False
 
-            # Create a Bomb
-            turns = random.randint(1, 3)
-            new_bomb = Bomb(bomb_x, bomb_y, self, turns, bomb_type="initial")
-            self.bombs.append(new_bomb)
+        return choice
 
 
 if __name__ == "__main__":

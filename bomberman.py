@@ -13,23 +13,22 @@ class Game:
         """
         Initialize the Game object.
 
-        - Set up the screen, clock, and game state.
-        - Initialize player, bombs, bomb queue, and explosions.
-        - Generate the game map and add initial bombs.
+        - Sets up the screen, clock, and game state.
+        - Initializes players, bombs, bomb queue, and explosions.
+        - Generates the game map and adds initial bombs.
         """
         pygame.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
         pygame.display.set_caption("Bomberman")
         self.running = True
-        self.players = [Player(self, 1), Player(self, 2)]  # Two players
+        self.players = [Player(self, 1), Player(self, 2)]
         self.bombs = []
-        self.bomb_queue = deque()  # Queue for handling bomb explosions
-        self.bomb_counter = 0  # Tracks the number of bombs on the map
+        self.bomb_queue = deque()
+        self.bomb_counter = 0
         self.explosions = []
         self.tiles = Game.create_map()
 
-        # Add initial bombs to the map
         self.setup_initial_bombs()
 
     @staticmethod
@@ -55,17 +54,19 @@ class Game:
 
     @staticmethod
     def get_input_state():
-        """Handle inputs for both players"""
+        """
+        Retrieve the current state of player inputs.
+
+        :return: Dictionary mapping movement and bomb actions to key states.
+        """
         keys = pygame.key.get_pressed()
         return {
-            # Player 1 (Arrow keys + Space)
             "p1_left": keys[pygame.K_LEFT],
             "p1_right": keys[pygame.K_RIGHT],
             "p1_up": keys[pygame.K_UP],
             "p1_down": keys[pygame.K_DOWN],
             "p1_bomb": keys[pygame.K_SPACE],
 
-            # Player 2 (WASD + LShift)
             "p2_left": keys[pygame.K_a],
             "p2_right": keys[pygame.K_d],
             "p2_up": keys[pygame.K_w],
@@ -75,10 +76,11 @@ class Game:
 
     def run(self):
         """
-        Main game loop.
+        Run the main game loop.
 
-        - Handles events, updates game state, and renders the screen.
-        - Runs at a constant frame rate defined by FPS.
+        - Handles user input events.
+        - Updates the game state.
+        - Renders all game elements on the screen.
         """
         while self.running:
             self.handle_events()
@@ -88,7 +90,7 @@ class Game:
 
     def handle_events(self):
         """
-        Handle events such as quitting the game.
+        Process game events such as quitting the game.
         """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -96,18 +98,18 @@ class Game:
 
     def update_game(self):
         """
-        Update the game state, including player, bombs, and explosions.
-        """
-        # Get all wall tiles for collision detection
-        walls = Wall.get_walls(self.tiles)
-        # walls = self.get_walls()
+        Update the game state, including player movements, bomb explosions, and ongoing animations.
 
-        # Update the player based on input
+        - Updates players based on user input.
+        - Processes bomb explosions using the bomb queue.
+        - Updates ongoing explosions.
+        """
+        walls = Wall.get_walls(self.tiles)
         input_state = self.get_input_state()
+
         for player in self.players:
             player.update(input_state, walls, self.bombs)
 
-        # Handle bomb explosions (process the bomb queue)
         if len(self.bomb_queue) >= 3:
             first_bomb = self.bomb_queue.popleft()
             first_bomb.explode()
@@ -118,15 +120,15 @@ class Game:
     def render(self):
         """
         Render all game elements onto the screen.
+
+        - Draws the game board, including tiles, players, bombs, and explosions.
         """
         self.screen.fill((0, 0, 0))
 
-        # Draw all tiles
         for row in self.tiles:
             for tile in row:
                 tile.draw(self.screen)
 
-        # Draw the player, bombs, and explosions
         for player in self.players:
             player.draw(self.screen)
         for bomb in self.bombs:
@@ -135,20 +137,29 @@ class Game:
         pygame.display.flip()
 
     def setup_initial_bombs(self):
-        """Ask the player if they want to manually place bombs."""
+        """
+        Prompt the player for bomb placement.
+
+        - Allows manual placement or automatic random placement of bombs.
+        - Calls methods to place bombs based on the player's choice.
+        """
         prompt = self.user_prompt()
-        if prompt:  # if prompt is 'y'
-            placed_bombs = Bomb.show_bomb_placement_screen(self)  # manually place bombs
-            bomb_turns = Bomb.get_bomb_turns(self, placed_bombs)  # Get turns for each bomb
+        if prompt:
+            placed_bombs = Bomb.show_bomb_placement_screen(self)
+            bomb_turns = Bomb.get_bomb_turns(self, placed_bombs)
 
             for (row, col), turn in bomb_turns.items():
                 bomb_x, bomb_y = col * TILE_SIZE, row * TILE_SIZE
                 self.bombs.append(Bomb(bomb_x, bomb_y, self, turn=turn, bomb_type="initial"))
-        else:  # if prompt is 'n'
-            Bomb.add_initial_bombs(self, 5)  # Automatic setup
+        else:
+            Bomb.add_initial_bombs(self, 5)
 
     def user_prompt(self):
-        """Show a simple Yes/No menu for bomb placement."""
+        """
+        Display a Yes/No prompt asking the player if they want to manually place bombs.
+
+        :return: True if the player chooses manual placement, False otherwise.
+        """
         font = pygame.font.Font(None, 36)
         selecting = True
         choice = False
@@ -158,8 +169,8 @@ class Game:
             bg_image = pygame.image.load("assets/background_image.png")
             bg_image = pygame.transform.scale(bg_image, (600, 600))
             self.screen.blit(bg_image, (0, 0))
-            text = font.render("Do you want to manually place bombs? (Y/N)",
-                               True, (255, 200, 100))  # (255, 200, 100)
+
+            text = font.render("Do you want to manually place bombs? (Y/N)", True, (255, 200, 100))
             self.screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - 50))
 
             pygame.display.flip()

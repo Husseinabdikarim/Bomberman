@@ -140,6 +140,12 @@ class Bomb:
         bg_overlay.set_alpha(180)  # Semi-transparent background
         bg_overlay.fill((193, 245, 241))  # Black overlay
 
+        """
+        A tile is considered empty if it meets the following conditions:
+            - It is NOT in PROTECTED_TILES.
+            - It is an instance of the Tile class.
+            - It is NOT an instance of the Wall class.
+        """
         empty_tiles = []
         for row in range(15):
             for col in range(15):
@@ -156,14 +162,18 @@ class Bomb:
                 for col in range(15):
                     x, y = col * TILE_SIZE, row * TILE_SIZE
 
+                    # Checks if there is a Wall. If so, color it Black
                     if isinstance(tiles[row][col], Wall):
-                        pygame.draw.rect(screen, (0, 0, 0), (x, y, TILE_SIZE, TILE_SIZE))
+                        pygame.draw.rect(screen, (0, 0, 0),
+                                         (x, y, TILE_SIZE, TILE_SIZE))
                     elif (row, col) in empty_tiles:
-                        pygame.draw.rect(screen, (0, 0, 0), (x, y, TILE_SIZE, TILE_SIZE), 2)
+                        pygame.draw.rect(screen, (0, 0, 0),
+                                         (x, y, TILE_SIZE, TILE_SIZE), 2)
 
                     # If already selected, fill it in
                     if (row, col) in placed_bombs:
-                        pygame.draw.rect(screen, (200, 50, 50), (x + 5, y + 5, TILE_SIZE - 10, TILE_SIZE - 10))
+                        pygame.draw.rect(screen, (200, 50, 50),
+                                         (x + 5, y + 5, TILE_SIZE - 10, TILE_SIZE - 10))
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

@@ -3,7 +3,7 @@ import random
 from explosion import Explosion
 from wall import Wall
 from tile import Tile
-from config import WIDTH, HEIGHT, TILE_SIZE, PROTECTED_TILES
+from config import WIDTH, HEIGHT, TILE_SIZE, PROTECTED_TILES, GRID_SZE_ROW, GRID_SZE_COL
 
 
 class Bomb:
@@ -108,8 +108,8 @@ class Bomb:
         for _ in range(num_bombs):
             # Find all empty tiles
             empty_tiles = []
-            for row in range(15):
-                for col in range(15):
+            for row in range(GRID_SZE_ROW):
+                for col in range(GRID_SZE_COL):
                     if (col, row) in PROTECTED_TILES:
                         continue
                     # Add the tile to empty_tiles if it is a Tile and not a Wall
@@ -147,8 +147,8 @@ class Bomb:
             - It is NOT an instance of the Wall class.
         """
         empty_tiles = []
-        for row in range(15):
-            for col in range(15):
+        for row in range(GRID_SZE_ROW):
+            for col in range(GRID_SZE_COL):
                 if ((row, col) not in PROTECTED_TILES and isinstance(tiles[row][col], Tile)
                         and not isinstance(tiles[row][col], Wall)):
                     empty_tiles.append((row, col))
@@ -158,13 +158,16 @@ class Bomb:
         while selecting:
             screen.blit(bg_overlay, (0, 0))
 
-            for row in range(15):
-                for col in range(15):
+            for row in range(GRID_SZE_ROW):
+                for col in range(GRID_SZE_COL):
                     x, y = col * TILE_SIZE, row * TILE_SIZE
 
                     # Checks if there is a Wall. If so, color it Black
                     if isinstance(tiles[row][col], Wall):
                         pygame.draw.rect(screen, (0, 0, 0),
+                                         (x, y, TILE_SIZE, TILE_SIZE))
+                    elif (row, col) in PROTECTED_TILES:
+                        pygame.draw.rect(screen, (75, 82, 89),
                                          (x, y, TILE_SIZE, TILE_SIZE))
                     elif (row, col) in empty_tiles:
                         pygame.draw.rect(screen, (0, 0, 0),

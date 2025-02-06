@@ -1,6 +1,6 @@
 import pygame
 from bomb import Bomb
-from config import WIDTH, HEIGHT, TILE_SIZE, PLAYER_SIZE
+from config import WIDTH, HEIGHT, TILE_SIZE, PLAYER_SIZE, GRID_SZE_ROW, GRID_SZE_COL
 
 
 class Player:
@@ -34,7 +34,7 @@ class Player:
         """Set different starting positions for players"""
         if self.player_num == 1:
             return 0, 0
-        return (WIDTH - TILE_SIZE), (HEIGHT - TILE_SIZE)
+        return (GRID_SZE_COL - 1) * TILE_SIZE, (GRID_SZE_ROW - 1) * TILE_SIZE
 
     def get_player_input(self, input_state):
         """Get movement direction for this specific player"""
@@ -84,10 +84,15 @@ class Player:
             if player_rect.colliderect(wall_rect):
                 return
 
-        # In Player.update():
         for other_player in self.game.players:
             if other_player != self:
-                # Check both CURRENT and TARGET positions
+                """
+               A collision is detected if any of the following conditions are met:
+                   - The player's current position overlaps with another player's current position.
+                   - The player's target position overlaps with another player's current position.
+                   - The player's current position overlaps with another player's target position.
+                   - The player's target position overlaps with another player's target position.
+               """
                 other_current_rect = pygame.Rect(other_player.x, other_player.y, PLAYER_SIZE, PLAYER_SIZE)
                 other_target_rect = pygame.Rect(other_player.target_x, other_player.target_y, PLAYER_SIZE, PLAYER_SIZE)
 

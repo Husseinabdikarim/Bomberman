@@ -1,11 +1,12 @@
 import pygame
 import random
-from player import Player
 from bomb import Bomb
 from wall import Wall
 from tile import Tile
-from config import WIDTH, HEIGHT, TILE_SIZE, FPS, EXCLUDED_ROWS, EXCLUDED_COLS
+from player import Player
 from collections import deque
+from config import (WIDTH, HEIGHT, TILE_SIZE, FPS, EXCLUDED_ROWS,
+                    EXCLUDED_COLS, GRID_SZE_ROW, GRID_SZE_COL)
 
 
 class Game:
@@ -39,9 +40,9 @@ class Game:
         :return: A 2D list representing the map tiles.
         """
         tiles = []
-        for row in range(15):
+        for row in range(GRID_SZE_ROW):
             row_tiles = []
-            for col in range(15):
+            for col in range(GRID_SZE_COL):
                 if row in EXCLUDED_ROWS and col in EXCLUDED_COLS:
                     row_tiles.append(Tile(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, 0))  # 0 = Empty tile
                 else:
